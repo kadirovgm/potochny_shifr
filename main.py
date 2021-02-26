@@ -8,19 +8,30 @@
 import math
 import random
 
-# regist = []
-# regist = random.getrandbits(1000)
+
+def Rand(start, end, num):
+    res = []
+    for j in range(num):
+        res.append(random.randint(start, end))
+    with open('key.txt', mode='w', encoding="utf-8") as file_reg:  # начальное значение регистра
+        file_reg.write(str(res))
+    return res
 
 
-def regist_gen(N):
-    with open('regist.txt', mode='w', encoding="utf-8") as file:
-        # regist = []
-        regist = random.getrandbits(N)
-        file.write(str(regist))
-    return regist
+num = 10000
+start = 0
+end = 1
 
+Rand(start, end, num)
+# def regist_gen(N):
+#     with open('regist.txt', mode='w', encoding="utf-8") as file:
+#         # regist = []
+#         regist = random.getrandbits(N)
+#         file.write(str(regist))
+#     return regist
+#
 
-regist_gen(10000)
+# regist_gen(10000)
 
 
 # print(regist)
