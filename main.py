@@ -91,22 +91,24 @@ def lfsr(taps, n):  # передаем степенИ полинома и раз
         seed = f.read()
         print("Что считал с key.txt: " + str(seed))
 
-    sr = seed
+
+    sr = seed  # исходный регистр
     xor = 0
     m = []  # список для М - последовательности
 
     for i in range(n):  # n - 4*31 = 124
         m.append(sr[len(sr) - 1])
+    print("m - posled: " + str(m))
     for t in taps:
         xor ^= int(sr[len(sr)-t])
-    print(xor)
+    print("xor: " + str(xor))
     sr = str(xor) + sr[:-1]
     xor = 0
     print(sr)
     # if sr == seed:
     # break
     print("м-последовательность")
-    return m
+    return m  # может sr??
 
 
 m = lfsr(pol, 4*razr)
