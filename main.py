@@ -98,18 +98,18 @@ def lfsr(taps, n):  # передаем степенИ полинома и раз
 
     for i in range(n):  # n - 4*31 = 124
         m.append(sr[len(sr) - 1])
-    print("m - posled: " + str(m))
-    for t in taps:
-        xor ^= int(sr[len(sr)-t])
-    print("xor: " + str(xor))
-    sr = str(xor) + sr[:-1]
+    # print("m - posled: " + str(m))
+        for t in taps:
+            xor ^= int(sr[len(sr)-t])
+    # print("xor: " + str(xor))
+        sr = str(xor) + sr[:-1]
     xor = 0
-    print(sr)
+    print(len(sr))  # м - последовательность найдена?
+
     # if sr == seed:
     # break
     print("м-последовательность")
-    return m  # может sr??
-
+    return m
 
 m = lfsr(pol, 4*razr)
 print(m)
