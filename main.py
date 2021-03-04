@@ -111,6 +111,7 @@ def lfsr(taps, n):  # передаем степенИ полинома и раз
     print("м-последовательность")
     return m
 
+
 m = lfsr(pol, 4*razr)
 print(m)
 
