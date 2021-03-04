@@ -7,7 +7,7 @@ import math
 
 polynom_koef = input().split()
 
-with open('key.txt', mode='w') as file:
+with open('key_2.txt', mode='w') as file:
     bitString = ''.join(random.choice('01') for i in range(31))
     file.write(bitString)
 lenght = len(bitString)
@@ -27,7 +27,7 @@ def mseries(start_list, polynom_koef) -> str:
         start_list.pop()  # из битовой последовательности удаляем правый элемент, который ушел на выход
     # print(output)
     output = ''.join(map(str, output))
-    with open('key.txt', mode='w') as file:
+    with open('key_2.txt', mode='w') as file:
         file.write(''.join((map(str, start_list))))
     print(output)
     return output
@@ -92,7 +92,7 @@ def correlation_test(m_posled: str, k: int) -> float:
 
 
 def encrypt(key: str) -> list:
-    with open('test_input.txt') as file:
+    with open('test_input_2.txt') as file:
         input_text = file.readline()
         binary_code = bin(int.from_bytes(input_text.encode(), 'big'))[2:]
     key = list(map(int, key))
@@ -116,7 +116,7 @@ def decrypt(key: str, encrypted_text: list) -> str:
     print(decrypt_bits)
     decrypt = n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(encoding='utf-8')
     print(decrypt)
-    with open('decrypted.txt', mode='w') as file:
+    with open('decrypted_2.txt', mode='w') as file:
         file.write(decrypt)
 
     return str(decrypt)
