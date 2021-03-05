@@ -115,7 +115,7 @@ def lfsr_generate(powers, n):  # передаем степенИ полином�
 # m = lfsr_generate(polynom, 4 * razr)
 m = lfsr_generate(polynom, 100000)
 
-
+# print(m)  # !!!!!!!!!!!DONT DO THAT SHEET
 
 # mm = m
 # # print(mm)
@@ -195,17 +195,70 @@ def correlation_test(m_psld, k):
     print('R = ', R)
 
     Rcrit = 1 / (N - 1) + 2 / (N - 2) * math.sqrt(N * (N - 3) / (N + 1)) # расчитываем критическое
-    print('R critical = ', Rcrit)
+    print('R (критичный) = ', Rcrit)
 
     if abs(Rcrit) > abs(R):
-        print('OK')
+        print('Корреляционный тест пройден!')
     else:
-        print('R should be smaller')
+        print('R должен быть меньше, корреляционный тест не пройден!')
 
     return R
 
 
 correlation_test(m, 1) # вызов
+
+
+# Начинаем шифрование!!!!
+print('\n')
+print("--- ШИФРОВАНИЕ ---")
+
+
+def encrypt (key: str) -> list:
+    with open("text.txt") as file_text:
+        input_text = file_text.readline()
+        binary_code = bin(int.from_bytes(input_text.encode(), 'big'))[2:]
+    key = list(map(int, key))
+    binary_code = list(map(int, binary_code))
+    encrypted_text = []
+    for liter, code in zip(binary_code, key):
+        encrypted_text.append(liter ^ code)
+    print("  <Зашифрованное сообщение> \n" + str(encrypted_text))
+
+    with open('encrypted_text', mode='w') as file_encrypt:
+        file_encrypt.write(str(encrypted_text))
+
+    return encrypted_text
+
+
+
+result_encrypt = encrypt(m)
+
+
+def decrypt(key, encrypted_text):
+    decrypted_text = []
+    key = list(map(int, key))
+    for liter, code in zip(encrypted_text, key):
+        decrypted_text.append(liter ^ code)
+    decrypted_text = ''.join(map(str, decrypted_text))
+    n = int(decrypted_text, 2)
+    decrypt_bits = ' '.join(format(ord(x), 'b') for x in ' '.join(map(str, decrypted_text)))
+    print("  <Расшифрованные биты> \n" + str(decrypt_bits))
+    decrypt = n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(encoding='utf-8')
+    print("  <Сообщение после расшифровки> \n" + str(decrypt))
+    with open('decrypted_text.txt', mode='w') as file:
+        file.write(decrypt)
+
+    return str(decrypt)
+
+
+result_decrypt = decrypt(m, result_encrypt)
+
+
+
+
+
+
+
 
 # encrypt !!!
 # decrypt !!!
