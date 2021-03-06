@@ -11,31 +11,6 @@ import math
 import random
 import itertools
 
-# def rand(start, end, num):
-#     res = []
-#     for j in range(num):
-#         res.append(random.randint(start, end))
-#     with open('key.txt', mode='w', encoding="utf-8") as file_reg:  # начальное значение регистра
-#         file_reg.write(str(res))
-#
-#     return res
-#
-#
-# num = 4
-# start = 0
-# end = 1
-#
-# begin = rand(start, end, num)
-#
-#
-# def keygen(begin, num):
-#     b = begin
-#     for i in range(1000):
-#         b[num+i] = b[0] ^ b[3]
-#     return b
-#
-# print(keygen(begin, num))
-
 
 print("Количество степеней полинома: ")
 count = int(input())
@@ -51,7 +26,6 @@ print("Полином: x^" + str(polynom[0]) + " + x^" + str(polynom[1]))
 print("Старший разряд: " + str(razr))
 
 # Теперь pol содержит два степеня полинома - 31,3
-
 
 # def createbi(k):
 #     r = random.randint(0, pow(2, k)-1)
@@ -112,19 +86,11 @@ def lfsr_generate(powers, n):  # передаем степенИ полином�
     return m
 
 
-# m = lfsr_generate(polynom, 4 * razr)
 m = lfsr_generate(polynom, 100000)
 
-# print(m)  # !!!!!!!!!!!DONT DO THAT SHEET
+# print(m)
 
-# mm = m
-# # print(mm)
-# xx = len(mm) - 1  # объединение элементов списка в одно целое число
-# m_perevod = 0
-# for t, l in enumerate(mm):
-#     m_perevod += l * 10 ** (xx - t)
 
-#
 # CЕРИАЛЬНЫЙ ТЕСТ
 print('\n')
 print("--- СЕРИАЛЬНЫЙ ТЕСТ ---")
@@ -205,7 +171,7 @@ def correlation_test(m_psld, k):
     return R
 
 
-correlation_test(m, 1) # вызов
+correlation_test(m, 1)  # вызов
 
 
 # Начинаем шифрование!!!!
@@ -213,15 +179,28 @@ print('\n')
 print("--- ШИФРОВАНИЕ ---")
 
 
-def encrypt (key: str) -> list:
+def encrypt(key):
     with open("text.txt") as file_text:
         input_text = file_text.readline()
         binary_code = bin(int.from_bytes(input_text.encode(), 'big'))[2:]
+
+    with open('binary_text.txt', mode='w') as file_binary:
+        file_binary.write(str(binary_code))
+
     key = list(map(int, key))
     binary_code = list(map(int, binary_code))
+
     encrypted_text = []
     for liter, code in zip(binary_code, key):
         encrypted_text.append(liter ^ code)
+
+    x = len(encrypted_text) - 1  # объединение элементов списка в одно целое число
+    res_perevod_encrypted_text = 0
+    for i, v in enumerate(encrypted_text):
+        res_perevod_encrypted_text += v * 10 ** (x - i)
+    with open('encrypted_text_str', mode='w') as file_encrypt_str:
+        file_encrypt_str.write(str(res_perevod_encrypted_text))
+
     print("  <Зашифрованное сообщение> \n" + str(encrypted_text))
 
     with open('encrypted_text', mode='w') as file_encrypt:
@@ -230,8 +209,8 @@ def encrypt (key: str) -> list:
     return encrypted_text
 
 
-
 result_encrypt = encrypt(m)
+
 
 
 def decrypt(key, encrypted_text):
@@ -254,10 +233,39 @@ def decrypt(key, encrypted_text):
 result_decrypt = decrypt(m, result_encrypt)
 
 
+# TASK 5 !!!!!!!
+
+# Сериальный тест для исходного сообщеения
+print("\n\n")
+print("--- СЕРИАЛЬНЫЙ ТЕСТ ДЛЯ ИСХОДНОГО ТЕКСТА ---")
+with open('binary_text.txt') as file_binary:  # считываем регистр
+    binary_text = file_binary.read()
+
+serial_test_result_text = serial_test_generator(binary_text)
 
 
+# Сериальный тест для зашифрованного сообщения
+print("\n\n")
+print("--- СЕРИАЛЬНЫЙ ТЕСТ ДЛЯ ЗАШИФРОВАННОГО ТЕКСТА ---")
+with open('encrypted_text_str') as encrypted_text_str:  # считываем регистр
+    encrypted_text = encrypted_text_str.read()
+
+serial_test_result_encrypt = serial_test_generator(encrypted_text)
 
 
+# Корреляционный тест для исходного сообщеения
+print("\n\n")
+print("--- КОРРЕЛЯЦИОННЫЙ ТЕСТ ДЛЯ ИСХОДНОГО ТЕКСТА ---")
+# нужно передавать список, возможно
+
+correlation_test_result_text = correlation_test(binary_text, 1)
+
+
+# Корреляционный тест для зашифрованного сообщеения
+print("\n\n")
+print("--- КОРРЕЛЯЦИОННЫЙ ТЕСТ ДЛЯ ЗАШИФРОВАННОГО ТЕКСТА ---")
+
+correlation_test_result_encrypt = correlation_test(result_encrypt, 1)
 
 
 # encrypt !!!
