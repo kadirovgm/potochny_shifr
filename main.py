@@ -86,8 +86,7 @@ def lfsr_generate(powers, n):  # передаем степенИ полином�
     return m
 
 
-m = lfsr_generate(polynom, 100000)
-
+m = lfsr_generate(polynom, 100000)  # генерация м-последовательности
 # print(m)
 
 
@@ -96,7 +95,7 @@ print('\n')
 print("--- СЕРИАЛЬНЫЙ ТЕСТ ---")
 # all_parameters = [['parm1', 'parm2', 'parm3', 'parm4'], ['parm21','parm22','parm23']]
 
-res_m_str = ''
+res_m_str = ''  # подготовка м-последовательности для сериального теста, объединяем элементы списка в одно число (убираем пробелы)
 for parameters in m:
     res_m_str += '' + ''.join(parameters)
 with open('m_stroka.txt', mode='w', encoding="utf-8") as file_m_str:  # начальное значение регистра
@@ -121,16 +120,16 @@ def serial_test_generator(m):
         el = ''.join(map(str, el))
         print(el)
         frequencies.append(new_series[2 * razr:].count(el))
-    print("Количество повторений: " + str(frequencies))
+    print("Количество повторений: " + str(frequencies))  # промежуточное состояние
 
-    hi_squared = [((i - n_teor) ** 2 / n_teor) for i in frequencies]
+    hi_squared = [((i - n_teor) ** 2 / n_teor) for i in frequencies]  # основная формула для сериального теста
     print(hi_squared)
     hi_squared = sum(hi_squared)
     print('Критерий Пирса X^2 = ', hi_squared)
     return hi_squared
 
 
-result_serial = serial_test_generator(res_m_str)
+result_serial = serial_test_generator(res_m_str) # вызов функции сериального теста для м-последовательности
 
 
 # КОРРЕЛЯЦИОННЫЙ ТЕСТ
@@ -171,7 +170,7 @@ def correlation_test(m_psld, k):
     return R
 
 
-correlation_test(m, 1)  # вызов
+correlation_test(m, 1)  # вызов для м-последовательности
 
 
 # Начинаем шифрование!!!!
@@ -182,23 +181,24 @@ print("--- ШИФРОВАНИЕ ---")
 def encrypt(key):
     with open("text.txt") as file_text:
         input_text = file_text.readline()
-        binary_code = bin(int.from_bytes(input_text.encode(), 'big'))[2:]
+        binary_code = bin(int.from_bytes(input_text.encode(), 'big'))[2:] # переводим текст в бинарный вид
 
-    with open('binary_text.txt', mode='w') as file_binary:
+    with open('binary_text.txt', mode='w') as file_binary:  # записываем бинарный текст для последующих тестов
         file_binary.write(str(binary_code))
 
-    key = list(map(int, key))
-    binary_code = list(map(int, binary_code))
+    key = list(map(int, key))  # переводим м-последовательность в список
+    binary_code = list(map(int, binary_code))  # переводим исходный текст в бинарном виде в список
 
-    encrypted_text = []
+    encrypted_text = []  # список для записи зашифрованного текста (в бинарном виде)
     for liter, code in zip(binary_code, key):
-        encrypted_text.append(liter ^ code)
+        encrypted_text.append(liter ^ code)  # шифрование
 
     x = len(encrypted_text) - 1  # объединение элементов списка в одно целое число
     res_perevod_encrypted_text = 0
     for i, v in enumerate(encrypted_text):
         res_perevod_encrypted_text += v * 10 ** (x - i)
-    with open('encrypted_text_str', mode='w') as file_encrypt_str:
+
+    with open('encrypted_text_str', mode='w') as file_encrypt_str:  # записываем зашифрованное сообщение в бинарном виде для последующих тестов
         file_encrypt_str.write(str(res_perevod_encrypted_text))
 
     print("  <Зашифрованное сообщение> \n" + str(encrypted_text))
@@ -209,10 +209,10 @@ def encrypt(key):
     return encrypted_text
 
 
-result_encrypt = encrypt(m)
+result_encrypt = encrypt(m)  # вызов функции шифрования
 
 
-
+# РАСШИФРОВКА
 def decrypt(key, encrypted_text):
     decrypted_text = []
     key = list(map(int, key))
@@ -230,7 +230,7 @@ def decrypt(key, encrypted_text):
     return str(decrypt)
 
 
-result_decrypt = decrypt(m, result_encrypt)
+result_decrypt = decrypt(m, result_encrypt)  # вызов функции расшифровки
 
 
 # TASK 5 !!!!!!!
@@ -266,42 +266,6 @@ print("\n\n")
 print("--- КОРРЕЛЯЦИОННЫЙ ТЕСТ ДЛЯ ЗАШИФРОВАННОГО ТЕКСТА ---")
 
 correlation_test_result_encrypt = correlation_test(result_encrypt, 1)
-
-
-# encrypt !!!
-# decrypt !!!
-
-# def encrypt(key: str) -> list:
-#     with open('test_input_2.txt') as file:
-#         input_text = file.readline()
-#         binary_code = bin(int.from_bytes(input_text.encode(), 'big'))[2:]
-#     key = list(map(int, key))
-#     binary_code = list(map(int, binary_code))
-#     encrypted_text = []
-#     for liter, code in zip(binary_code, key):
-#         encrypted_text.append(liter ^ code)
-#     print(encrypted_text)
-#
-#     return encrypted_text
-#
-#
-# def decrypt(key: str, encrypted_text: list) -> str:
-#     decrypted_text = []
-#     key = list(map(int, key))
-#     for liter, code in zip(encrypted_text, key):
-#         decrypted_text.append(liter ^ code)
-#     decrypted_text = ''.join(map(str, decrypted_text))
-#     n = int(decrypted_text, 2)
-#     decrypt_bits = ' '.join(format(ord(x), 'b') for x in ' '.join(map(str, decrypted_text)))
-#     print(decrypt_bits)
-#     decrypt = n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(encoding='utf-8')
-#     print(decrypt)
-#     with open('decrypted_2.txt', mode='w') as file:
-#         file.write(decrypt)
-#
-#     return str(decrypt)
-
-
 
 
 
