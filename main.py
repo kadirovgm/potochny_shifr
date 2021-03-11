@@ -10,6 +10,7 @@
 import math
 import random
 import itertools
+import re
 
 
 print("Количество степеней полинома: ")
@@ -90,7 +91,7 @@ m = lfsr_generate(polynom, 100000)  # генерация м-последоват
 # print(m)
 
 
-# CЕРИАЛЬНЫЙ ТЕСТ
+# CЕРИАЛЬНЫЙ ТЕСТ НА РАВНОМЕРНОСТЬ
 print('\n')
 print("--- СЕРИАЛЬНЫЙ ТЕСТ ---")
 # all_parameters = [['parm1', 'parm2', 'parm3', 'parm4'], ['parm21','parm22','parm23']]
@@ -104,8 +105,8 @@ with open('m_stroka.txt', mode='w', encoding="utf-8") as file_m_str:  # нача
 
 
 def serial_test_generator(m):
-    count_povtor = 2  # длина повторений от (к)
-    k = 2
+    count_povtor = 4  # длина повторений от (к)
+    k = 4
     bites = [0, 1]
     series_count = [group for group in set(itertools.permutations(bites * count_povtor, k))] # перестановки длиной k из iterable.
 
@@ -119,17 +120,17 @@ def serial_test_generator(m):
     for el in series_count:
         el = ''.join(map(str, el))
         print(el)
-        frequencies.append(new_series[2 * razr:].count(el))
+        frequencies.append(new_series[2 * razr:].count(el))  # n(э) частота (количество серий которая совпадает с j комбинацией)
     print("Количество повторений: " + str(frequencies))  # промежуточное состояние
 
     hi_squared = [((i - n_teor) ** 2 / n_teor) for i in frequencies]  # основная формула для сериального теста
-    print(hi_squared)
+    print("Промежуточно: " + str(hi_squared))
     hi_squared = sum(hi_squared)
-    print('Критерий Пирса X^2 = ', hi_squared)
+    print('Критерий Пирса X^2 = ', hi_squared)  # мера отклонения
     return hi_squared
 
 
-result_serial = serial_test_generator(res_m_str) # вызов функции сериального теста для м-последовательности
+result_serial = serial_test_generator(res_m_str)  # вызов функции сериального теста для м-последовательности
 
 
 # КОРРЕЛЯЦИОННЫЙ ТЕСТ
@@ -144,8 +145,8 @@ def correlation_test(m_psld, k):
     m1 = m2 = m1_sqr = m2_sqr = M = 0
 
     for i in range(N - k):
-        m1 += 1 / (N - k) * m_psld[i]  # мат ожидание первой пслдв начиная от 0 до к
-        m2 += 1 / (N - k) * m_psld[k + i]  # мат ожидание первой пслдв начиная от k до N
+        m1 += 1 / (N - k) * m_psld[i]  # промеж первой пслдв начиная от 0 до к
+        m2 += 1 / (N - k) * m_psld[k + i]  # промеж первой пслдв начиная от k до N
         m1_sqr += 1 / (N - k) * m_psld[i] ** 2
         m2_sqr += 1 / (N - k) * m_psld[k + i] ** 2
 
@@ -159,7 +160,7 @@ def correlation_test(m_psld, k):
 
     print('R = ', R)
 
-    Rcrit = 1 / (N - 1) + 2 / (N - 2) * math.sqrt(N * (N - 3) / (N + 1)) # расчитываем критическое
+    Rcrit = 1 / (N - 1) + 2 / (N - 2) * math.sqrt(N * (N - 3) / (N + 1))  # расчитываем критическое
     print('R (критичный) = ', Rcrit)
 
     if abs(Rcrit) > abs(R):
@@ -183,6 +184,7 @@ def encrypt(key):
         input_text = file_text.readline()
         binary_code = bin(int.from_bytes(input_text.encode(), 'big'))[2:] # переводим текст в бинарный вид
 
+
     with open('binary_text.txt', mode='w') as file_binary:  # записываем бинарный текст для последующих тестов
         file_binary.write(str(binary_code))
 
@@ -190,8 +192,8 @@ def encrypt(key):
     binary_code = list(map(int, binary_code))  # переводим исходный текст в бинарном виде в список
 
     encrypted_text = []  # список для записи зашифрованного текста (в бинарном виде)
-    for liter, code in zip(binary_code, key):
-        encrypted_text.append(liter ^ code)  # шифрование
+    for litter, code in zip(binary_code, key):
+        encrypted_text.append(litter ^ code)  # шифрование
 
     x = len(encrypted_text) - 1  # объединение элементов списка в одно целое число
     res_perevod_encrypted_text = 0
@@ -200,9 +202,22 @@ def encrypt(key):
 
     with open('encrypted_text_str', mode='w') as file_encrypt_str:  # записываем зашифрованное сообщение в бинарном виде для последующих тестов
         file_encrypt_str.write(str(res_perevod_encrypted_text))
+    # print(encrypted_text)
 
-    print("  <Зашифрованное сообщение> \n" + str(encrypted_text))
+#####
 
+    encrypted_text_a = ''.join(map(str, encrypted_text))
+    decrypt_a = []
+    for i in range(len(encrypted_text_a)):
+        s = encrypted_text_a[i:i + 16]
+        # print(''.join([chr(int(x, 2)) for x in re.split('(........)', s) if x]))
+        decrypt_a.append(''.join([chr(int(x, 2)) for x in re.split('(........)', s) if x]))
+        # print(decrypt_a)
+    with open('encrypted_text_text', mode='w') as file_encrypt_text:
+        file_encrypt_text.write(str(decrypt_a))
+    print("Файл зашифрован в encrypted_text_text.txt!")
+    print(decrypt_a)
+#####
     with open('encrypted_text', mode='w') as file_encrypt:
         file_encrypt.write(str(encrypted_text))
 
@@ -216,12 +231,13 @@ result_encrypt = encrypt(m)  # вызов функции шифрования
 def decrypt(key, encrypted_text):
     decrypted_text = []
     key = list(map(int, key))
-    for liter, code in zip(encrypted_text, key):
-        decrypted_text.append(liter ^ code)
+    for litter, code in zip(encrypted_text, key):
+        decrypted_text.append(litter ^ code)
+    # print(decrypted_text)
     decrypted_text = ''.join(map(str, decrypted_text))
     n = int(decrypted_text, 2)
     decrypt_bits = ' '.join(format(ord(x), 'b') for x in ' '.join(map(str, decrypted_text)))
-    print("  <Расшифрованные биты> \n" + str(decrypt_bits))
+    # print("  <Расшифрованные биты> \n" + str(decrypt_bits))
     decrypt = n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(encoding='utf-8')
     print("  <Сообщение после расшифровки> \n" + str(decrypt))
     with open('decrypted_text.txt', mode='w') as file:
@@ -258,7 +274,7 @@ print("\n\n")
 print("--- КОРРЕЛЯЦИОННЫЙ ТЕСТ ДЛЯ ИСХОДНОГО ТЕКСТА ---")
 # нужно передавать список, возможно
 
-correlation_test_result_text = correlation_test(binary_text, 1)
+correlation_test_result_text = correlation_test(binary_text, 16)
 
 
 # Корреляционный тест для зашифрованного сообщеения
