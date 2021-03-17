@@ -192,6 +192,7 @@ def encrypt(key):
     binary_code = list(map(int, binary_code))  # переводим исходный текст в бинарном виде в список
 
     encrypted_text = []  # список для записи зашифрованного текста (в бинарном виде)
+
     for litter, code in zip(binary_code, key):
         encrypted_text.append(litter ^ code)  # шифрование
 
@@ -204,20 +205,21 @@ def encrypt(key):
         file_encrypt_str.write(str(res_perevod_encrypted_text))
     # print(encrypted_text)
 
-#####
+############################### Осталось показать (зашифрованное сообщение в виде иероглифов)
 
     encrypted_text_a = ''.join(map(str, encrypted_text))
-    decrypt_a = []
+    decrypt_a = []  # зашифрованное сообщение в бинарном переводим в текст
     for i in range(len(encrypted_text_a)):
-        s = encrypted_text_a[i:i + 16]
+        s = encrypted_text_a[i:i + 16] # разбиваем на блоки по 16 бит
         # print(''.join([chr(int(x, 2)) for x in re.split('(........)', s) if x]))
-        decrypt_a.append(''.join([chr(int(x, 2)) for x in re.split('(........)', s) if x]))
+        decrypt_a.append(''.join([chr(int(x, 2)) for x in re.split('(........)', s) if x])) # сплит разделяет строку по 8 бит каждые 16 бит (s)
         # print(decrypt_a)
+    decrypt_aa = ''.join(map(str, decrypt_a))
     with open('encrypted_text_text', mode='w') as file_encrypt_text:
-        file_encrypt_text.write(str(decrypt_a))
-    print("Файл зашифрован в encrypted_text_text.txt!")
-    print(decrypt_a)
-#####
+        file_encrypt_text.write(str(decrypt_aa))
+    print("Файл зашифрован в encrypted_text_text.txt")
+    print("++" + str(decrypt_aa))
+##############################
     with open('encrypted_text', mode='w') as file_encrypt:
         file_encrypt.write(str(encrypted_text))
 
